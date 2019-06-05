@@ -36,10 +36,42 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     @objc
     func insertNewObject(_ sender: Any) {
         let context = self.fetchedResultsController.managedObjectContext
-        let newEvent = Event(context: context)
-             
+        
+        
+        let uiAlert = UIAlertController(title: "Enter ToDo", message: nil, preferredStyle: .alert)
+        uiAlert.addTextField { (titleTextField: UITextField) in
+            titleTextField.placeholder = "Title"
+        }
+        uiAlert.addTextField { (descriptionTextField: UITextField) in
+             descriptionTextField.placeholder = "Description"
+        }
+        uiAlert.addTextField { (priorityTextField: UITextField) in
+            priorityTextField.placeholder = "priority"
+            priorityTextField.keyboardType = .numberPad
+        }
+        let addAction = UIAlertAction(title: "Add", style: .default) { [unowned uiAlert] (_) in
+            
+//            let warningAlert = UIAlertController(title: "Warning", message: "Please fill out all fields.", preferredStyle: .alert)
+//            warningAlert.addAction(UIAlertAction(title: "OK", style: .default, handler:nil))
+            let title = uiAlert.textFields![0].text ?? UserDefaults.standard.string(forKey: "todo_title")
+            let des = uiAlert.textFields![1].text ??   UserDefaults.standard.string(forKey: "todo_description")
+            let num = uiAlert.textFields![2].text ?? UserDefaults.standard.string(forKey: "todo_priority")
+            
+            let newToDo = ToDo(context: context)
+            newToDo.priorityNumber = num
+            newToDo.title = title
+            newToDo.todoDescription = des
+
+        }
+        
+        uiAlert.addAction(addAction)
+        uiAlert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { (_) in
+            return
+        }))
+        
+        present(uiAlert, animated: true, completion: nil)
+
         // If appropriate, configure the new managed object.
-        newEvent.timestamp = Date()
 
         // Save the context.
         do {
@@ -79,8 +111,8 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-        let event = fetchedResultsController.object(at: indexPath)
-        configureCell(cell, withEvent: event)
+        let toDo = fetchedResultsController.object(at: indexPath)
+        configureCell(cell, withToDo: toDo)
         return cell
     }
 
@@ -105,24 +137,27 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         }
     }
 
-    func configureCell(_ cell: UITableViewCell, withEvent event: Event) {
-        cell.textLabel!.text = event.timestamp!.description
+    func configureCell(_ cell: UITableViewCell, withToDo toDo: ToDo) {
+//        cell.textLabel!.text = event.timestamp!.description
+        cell.textLabel!.text = toDo.title
+        cell.detailTextLabel?.text = toDo.todoDescription
+        
     }
 
     // MARK: - Fetched results controller
 
-    var fetchedResultsController: NSFetchedResultsController<Event> {
+    var fetchedResultsController: NSFetchedResultsController<ToDo> {
         if _fetchedResultsController != nil {
             return _fetchedResultsController!
         }
         
-        let fetchRequest: NSFetchRequest<Event> = Event.fetchRequest()
+        let fetchRequest: NSFetchRequest<ToDo> = ToDo.fetchRequest()
         
         // Set the batch size to a suitable number.
         fetchRequest.fetchBatchSize = 20
         
         // Edit the sort key as appropriate.
-        let sortDescriptor = NSSortDescriptor(key: "timestamp", ascending: false)
+        let sortDescriptor = NSSortDescriptor(key: "title", ascending: false)
         
         fetchRequest.sortDescriptors = [sortDescriptor]
         
@@ -142,8 +177,9 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         }
         
         return _fetchedResultsController!
-    }    
-    var _fetchedResultsController: NSFetchedResultsController<Event>? = nil
+    }
+    
+    var _fetchedResultsController: NSFetchedResultsController<ToDo>? = nil
 
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         tableView.beginUpdates()
@@ -167,9 +203,9 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
             case .delete:
                 tableView.deleteRows(at: [indexPath!], with: .fade)
             case .update:
-                configureCell(tableView.cellForRow(at: indexPath!)!, withEvent: anObject as! Event)
+                configureCell(tableView.cellForRow(at: indexPath!)!, withToDo: anObject as! ToDo)
             case .move:
-                configureCell(tableView.cellForRow(at: indexPath!)!, withEvent: anObject as! Event)
+                configureCell(tableView.cellForRow(at: indexPath!)!, withToDo: anObject as! ToDo)
                 tableView.moveRow(at: indexPath!, to: newIndexPath!)
             default:
                 return

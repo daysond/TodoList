@@ -17,7 +17,10 @@ class DetailViewController: UIViewController {
         // Update the user interface for the detail item.
         if let detail = detailItem {
             if let label = detailDescriptionLabel {
-                label.text = detail.timestamp!.description
+                let p = detail.priorityNumber!
+                let t = detail.title!
+                let d = detail.todoDescription!
+                label.text = "\(p) - \(t)\n\(d)"
             }
         }
     }
@@ -28,7 +31,7 @@ class DetailViewController: UIViewController {
         configureView()
     }
 
-    var detailItem: Event? {
+    var detailItem: ToDo? {
         didSet {
             // Update the view.
             configureView()
