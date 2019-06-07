@@ -14,6 +14,7 @@
 		ED8484A422A824F1008D39E0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ED8484A222A824F1008D39E0 /* Main.storyboard */; };
 		ED8484A622A824F2008D39E0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ED8484A522A824F2008D39E0 /* Assets.xcassets */; };
 		ED8484A922A824F2008D39E0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ED8484A722A824F2008D39E0 /* LaunchScreen.storyboard */; };
+		EDAA3C4122A8C058004FFE36 /* LogInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDAA3C4022A8C058004FFE36 /* LogInViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		ED8484A522A824F2008D39E0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		ED8484A822A824F2008D39E0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		ED8484AA22A824F2008D39E0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		EDAA3C4022A8C058004FFE36 /* LogInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +64,7 @@
 				ED84849E22A824F1008D39E0 /* MasterViewController.swift */,
 				ED8484A022A824F1008D39E0 /* DetailViewController.swift */,
 				ED8484A222A824F1008D39E0 /* Main.storyboard */,
+				EDAA3C4022A8C058004FFE36 /* LogInViewController.swift */,
 				ED8484A522A824F2008D39E0 /* Assets.xcassets */,
 				ED8484A722A824F2008D39E0 /* LaunchScreen.storyboard */,
 				ED8484AA22A824F2008D39E0 /* Info.plist */,
@@ -144,6 +147,7 @@
 				ED84849A22A824F1008D39E0 /* AppDelegate.swift in Sources */,
 				ED84849D22A824F1008D39E0 /* TodoList.xcdatamodeld in Sources */,
 				ED84849F22A824F1008D39E0 /* MasterViewController.swift in Sources */,
+				EDAA3C4122A8C058004FFE36 /* LogInViewController.swift in Sources */,
 				ED8484A122A824F1008D39E0 /* DetailViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -289,7 +293,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = D2VZ8N8LJC;
 				INFOPLIST_FILE = TodoList/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -306,7 +312,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = D2VZ8N8LJC;
 				INFOPLIST_FILE = TodoList/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

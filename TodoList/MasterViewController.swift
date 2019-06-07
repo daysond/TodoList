@@ -8,16 +8,20 @@
 
 import UIKit
 import CoreData
+import LocalAuthentication
 
 class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate {
 
     var detailViewController: DetailViewController? = nil
     var managedObjectContext: NSManagedObjectContext? = nil
+    var loggedIn = false
+    
 
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        
         navigationItem.leftBarButtonItem = editButtonItem
 
         let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(insertNewObject(_:)))
@@ -26,13 +30,19 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
             let controllers = split.viewControllers
             detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
         }
+
     }
 
     override func viewWillAppear(_ animated: Bool) {
         clearsSelectionOnViewWillAppear = splitViewController!.isCollapsed
         super.viewWillAppear(animated)
-    }
+        if !loggedIn {
+            presentLogIn()
+        }
+        
 
+    }
+    
     @objc
     func insertNewObject(_ sender: Any) {
         let context = self.fetchedResultsController.managedObjectContext
@@ -53,14 +63,23 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
             
 //            let warningAlert = UIAlertController(title: "Warning", message: "Please fill out all fields.", preferredStyle: .alert)
 //            warningAlert.addAction(UIAlertAction(title: "OK", style: .default, handler:nil))
-            let title = uiAlert.textFields![0].text ?? UserDefaults.standard.string(forKey: "todo_title")
-            let des = uiAlert.textFields![1].text ??   UserDefaults.standard.string(forKey: "todo_description")
-            let num = uiAlert.textFields![2].text ?? UserDefaults.standard.string(forKey: "todo_priority")
-            
+            let title = uiAlert.textFields![0].text!.isEmpty ? UserDefaults.standard.string(forKey: "todo_title")! : uiAlert.textFields![0].text
+            let des = uiAlert.textFields![1].text!.isEmpty ? UserDefaults.standard.string(forKey: "todo_description")! : uiAlert.textFields![1].text
+            let num = uiAlert.textFields![2].text!.isEmpty ? UserDefaults.standard.string(forKey: "todo_priority")! : uiAlert.textFields![2].text
             let newToDo = ToDo(context: context)
             newToDo.priorityNumber = num
             newToDo.title = title
             newToDo.todoDescription = des
+            newToDo.isCompleted = false
+            
+            do {
+                try context.save()
+            } catch {
+                // Replace this implementation with code to handle the error appropriately.
+                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+                let nserror = error as NSError
+                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+            }
 
         }
         
@@ -74,14 +93,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         // If appropriate, configure the new managed object.
 
         // Save the context.
-        do {
-            try context.save()
-        } catch {
-            // Replace this implementation with code to handle the error appropriately.
-            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-            let nserror = error as NSError
-            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-        }
+
     }
 
     // MARK: - Segues
@@ -102,6 +114,23 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         return fetchedResultsController.sections?.count ?? 0
+    }
+    
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        
+        guard let sectionInfo = fetchedResultsController.sections?[section] else { return "" }
+
+        var title = ""
+        switch sectionInfo.name {
+        case "0":
+            title = "Unfinished"
+        case "1":
+            title = "Finished"
+        default:
+            title = ""
+        }
+        
+        return title
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -157,15 +186,23 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         fetchRequest.fetchBatchSize = 20
         
         // Edit the sort key as appropriate.
-        let sortDescriptor = NSSortDescriptor(key: "title", ascending: false)
+        let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
+        let sortByBool = NSSortDescriptor(key: "isCompleted", ascending: true)
         
-        fetchRequest.sortDescriptors = [sortDescriptor]
+        fetchRequest.sortDescriptors = [sortByBool,sortDescriptor]
+
+//        fetchRequest.predicate = NSPredicate(format: "isCompleted == %@", NSNumber(booleanLiteral: false))
         
+
         // Edit the section name key path and cache name if appropriate.
         // nil for section name key path means "no sections".
-        let aFetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.managedObjectContext!, sectionNameKeyPath: nil, cacheName: "Master")
+        
+        let aFetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.managedObjectContext!, sectionNameKeyPath: "isCompleted", cacheName: "Master")
+        
+        
         aFetchedResultsController.delegate = self
         _fetchedResultsController = aFetchedResultsController
+        
         
         do {
             try _fetchedResultsController!.performFetch()
@@ -224,6 +261,36 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
          tableView.reloadData()
      }
      */
-
+    
+    //MARK: Log In VC
+    
+    func presentLogIn() {
+        
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let logInVC = storyboard.instantiateViewController(withIdentifier: "LogInVC") as! LogInViewController
+        self.present(logInVC, animated: false) {
+            logInVC.delegate = self
+            logInVC.authenticate()
+        }
+    }
+    
+    
 }
+
+//MARK: Delegate
+
+extension MasterViewController: SetLoggedInDelegate {
+    func setLoggedIn() {
+        self.loggedIn = true
+    }
+    
+    
+    
+    
+}
+
+
+
+
+
 

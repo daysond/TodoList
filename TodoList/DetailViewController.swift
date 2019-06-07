@@ -11,7 +11,9 @@ import UIKit
 class DetailViewController: UIViewController {
 
     @IBOutlet weak var detailDescriptionLabel: UILabel!
-
+    @IBOutlet weak var completeSwitch: UISwitch!
+    var appDelegte: AppDelegate!
+    
 
     func configureView() {
         // Update the user interface for the detail item.
@@ -28,7 +30,16 @@ class DetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        appDelegte = UIApplication.shared.delegate as? AppDelegate
         configureView()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        if let isCompleted = detailItem?.isCompleted {
+            completeSwitch.setOn(isCompleted, animated: true)
+        }
+        
     }
 
     var detailItem: ToDo? {
@@ -38,6 +49,11 @@ class DetailViewController: UIViewController {
         }
     }
 
-
+    @IBAction func switchToggled(_ sender: UISwitch) {
+       
+        detailItem?.isCompleted = completeSwitch.isOn
+        appDelegte.saveContext()
+    }
+    
 }
 
